@@ -51,9 +51,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   image: {
-    width: 250,
-    height: 250,
-    marginTop: 25,
+    width: 280,
+    height: 280,
     marginBottom: 40,
   },
   title: {
@@ -90,7 +89,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   footerText: {
-    marginTop: 20,
+    marginTop: 60,
     textAlign: 'center',
     color: '#666',
     fontSize: 12,
