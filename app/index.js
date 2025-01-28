@@ -1,57 +1,75 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
+import { Image, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 const Home = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" hidden={false} />
-      
-      <Image
-        source={require('../assets/logo.png')} 
-        style={styles.logo}
-      />
-
-      <Text style={styles.welcomeMessage}>
-        Bienvenue sur, l'application de gestion dédiée aux promotions du cycle master de l'Université Chouaib Doukkali - Faculté des Sciences. Simplifiez l'organisation de vos emplois du temps et accédez facilement aux informations essentielles.
-      </Text>
-
-      <Link href="/auth/login" asChild>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Commencer</Text>
-        </TouchableOpacity>
-      </Link>
-
-      <Text style={styles.footerText}>
-        Tous les droits sont réservés à l'Université Chouaib Doukkali © {currentYear}
-      </Text>
-    </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <StatusBar barStyle="light-content" hidden={false} />
+        
+        <Image
+          source={require('../assets/logo.png')}
+          style={styles.image}
+        />
+        
+        <Text style={styles.title}>
+          Bienvenue sur l'application de gestion dédiée aux promotions du cycle master de l'Université Chouaib Doukkali - Faculté des Sciences.
+        </Text>
+        
+        <Text style={styles.subtitle}>
+          Simplifiez l'organisation de vos emplois du temps et accédez facilement aux informations essentielles.
+        </Text>
+        
+        <Link href="/auth/login" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Commencer</Text>
+          </TouchableOpacity>
+        </Link>
+        
+        <Text style={styles.footerText}>
+          Tous les droits sont réservés à l'Université Chouaib Doukkali © {currentYear}
+        </Text>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
-
-export default Home;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
-  logo: {
-    width: 290,
-    height: 290,
-    marginBottom: 30,
-    marginTop:40,
-  },
-  welcomeMessage: {
-    fontSize: 14,
-    textAlign:"center",
-    color: '#333',
+  image: {
+    width: 250,
+    height: 250,
+    marginTop: 25,
     marginBottom: 40,
-    lineHeight: 24,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    fontStyle: "italic",
+    color: '#666',
+    marginBottom: 30,
+    lineHeight: 22,
   },
   button: {
     width: '100%',
@@ -59,7 +77,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -72,11 +90,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   footerText: {
-    position: 'absolute',
-    bottom: 20,
+    marginTop: 20,
     textAlign: 'center',
     color: '#666',
     fontSize: 12,
     paddingHorizontal: 20,
   },
 });
+
+export default Home;
