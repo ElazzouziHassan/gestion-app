@@ -31,6 +31,16 @@ const Home = () => {
             <Text style={styles.buttonText}>Commencer</Text>
           </TouchableOpacity>
         </Link>
+        <Link href="/auth/register/professor" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Professeur</Text>
+          </TouchableOpacity>
+        </Link>
+        <Link href="/auth/register/student" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Student</Text>
+          </TouchableOpacity>
+        </Link>
         
         <Text style={styles.footerText}>
           Tous les droits sont réservés à l'Université Chouaib Doukkali © {currentYear}
