@@ -1,124 +1,162 @@
-import { Button, Image, StyleSheet, Text, TextInput, KeyboardAvoidingView, Platform, ScrollView, View, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { Link } from "expo-router";  // Import Link for navigation
 
-const RegisterStudent = () => {
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    studentNumber: '',
-    email: '',
-    password: '',
-    cycle: '',
-    currentSemester: '',
-    major: '',
-    promo: '',
-  });
+const StudentRegister = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [studentNumber, setStudentNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [cycle, setCycle] = useState("");
+  const [currentSemester, setCurrentSemester] = useState("");
+  const [major, setMajor] = useState("");
+  const [promo, setPromo] = useState("");
 
-  const handleChange = (name, value) => {
-    setForm({ ...form, [name]: value });
-  };
+  const handleRegister = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/mobile-auth/students/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          studentNumber,
+          email,
+          password,
+          cycle,
+          currentSemester,
+          major,
+          promo,
+        }),
+      });
 
-  const handleRegister = () => {
-    const studentData = {
-      ...form,
-      role: 'student',
-      createdAt: new Date().toISOString(),
-    };
-    console.log('Registering student:', studentData);
+      const data = await response.json();
+
+      if (response.status === 201) {
+        Alert.alert("Succès", "Étudiant créé avec succès!", [
+          {
+            text: "OK",
+          },
+        ]);
+      } else {
+        Alert.alert("Erreur", data.error || "Une erreur est survenue.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription.");
+    }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <StatusBar barStyle="light-content" hidden={false} />
-        <Image source={require('../../../assets/logo.png')} style={styles.image} />
-        <Text style={styles.title}>Inscription Étudiant</Text>
-        
-        <TextInput placeholder="Prénom" style={styles.input} onChangeText={(text) => handleChange('firstName', text)} />
-        <TextInput placeholder="Nom" style={styles.input} onChangeText={(text) => handleChange('lastName', text)} />
-        <TextInput placeholder="Numéro étudiant" style={styles.input} onChangeText={(text) => handleChange('studentNumber', text)} />
-        <TextInput placeholder="Email" style={styles.input} keyboardType="email-address" onChangeText={(text) => handleChange('email', text)} />
-        <TextInput placeholder="Mot de passe" style={styles.input} secureTextEntry onChangeText={(text) => handleChange('password', text)} />
-        <TextInput placeholder="Cycle" style={styles.input} onChangeText={(text) => handleChange('cycle', text)} />
-        <TextInput placeholder="Semestre actuel" style={styles.input} onChangeText={(text) => handleChange('currentSemester', text)} />
-        <TextInput placeholder="Filière" style={styles.input} onChangeText={(text) => handleChange('major', text)} />
-        <TextInput placeholder="Promotion" style={styles.input} onChangeText={(text) => handleChange('promo', text)} />
-        
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>S'inscrire</Text>
-        </TouchableOpacity>
-
-        <Link href="/auth/login" style={styles.link}>Déjà inscrit ? Connectez-vous</Link>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Inscription Étudiant</Text>
+      <TextInput
+        value={firstName}
+        onChangeText={setFirstName}
+        style={styles.input}
+        placeholder="Prénom"
+      />
+      <TextInput
+        value={lastName}
+        onChangeText={setLastName}
+        style={styles.input}
+        placeholder="Nom"
+      />
+      <TextInput
+        value={studentNumber}
+        onChangeText={setStudentNumber}
+        style={styles.input}
+        placeholder="Numéro d'étudiant"
+      />
+      <TextInput
+        value={email}
+        onChangeText={setEmail}
+        style={styles.input}
+        placeholder="Email"
+        keyboardType="email-address"
+      />
+      <TextInput
+        value={password}
+        onChangeText={setPassword}
+        style={styles.input}
+        placeholder="Mot de passe"
+        secureTextEntry
+      />
+      <TextInput
+        value={cycle}
+        onChangeText={setCycle}
+        style={styles.input}
+        placeholder="Cycle"
+      />
+      <TextInput
+        value={currentSemester}
+        onChangeText={setCurrentSemester}
+        style={styles.input}
+        placeholder="Semestre actuel"
+      />
+      <TextInput
+        value={major}
+        onChangeText={setMajor}
+        style={styles.input}
+        placeholder="Majeure"
+      />
+      <TextInput
+        value={promo}
+        onChangeText={setPromo}
+        style={styles.input}
+        placeholder="Promo"
+      />
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>S'inscrire</Text>
+      </TouchableOpacity>
+      <Link href="/login" style={styles.link}>
+        Retour à la connexion
+      </Link>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
-  },
-  image: {
-    width: 250,
-    height: 250,
-    marginTop: 25,
-    marginBottom: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: '#333',
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    backgroundColor: "#fff",
   },
   button: {
-    width: '100%',
-    backgroundColor: '#0b1320',
+    backgroundColor: "#0b1320",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 15,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "bold",
   },
   link: {
     marginTop: 15,
-    marginBottom: 120,
-    color: '#48A6A7',
-    textDecorationLine: 'underline',
-  },
-  footerText: {
-    marginTop: 20,
-    textAlign: 'center',
-    color: '#666',
-    fontSize: 12,
-    paddingHorizontal: 20,
+    color: "#48A6A7",
+    textDecorationLine: "underline",
   },
 });
 
-export default RegisterStudent;
+export default StudentRegister;
