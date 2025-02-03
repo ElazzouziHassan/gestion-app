@@ -31,12 +31,12 @@ const Home = () => {
             <Text style={styles.buttonText}>Commencer</Text>
           </TouchableOpacity>
         </Link>
-        <Link href="/auth/register/professor" asChild>
+        <Link href="/professors/home" asChild>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Professeur</Text>
           </TouchableOpacity>
         </Link>
-        <Link href="/auth/register/student" asChild>
+        <Link href="/students/home" asChild>
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Student</Text>
           </TouchableOpacity>
