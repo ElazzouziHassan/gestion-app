@@ -1,17 +1,17 @@
-// app/prof/profile.js
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
 import Menu from '../../components/menu';
 
 const ProfessorProfile = () => {
   const professorData = {
-    name: "Dr. Ahmed Karim",
-    email: "ahmed.karim@ucd.ac.ma",
+    name: "Dr. BOUTKHOUM Omar",
+    email: "boutkhoum.omar@ucd.ac.ma",
     department: "Informatique",
     phone: "+212 6 12 34 56 78",
-    office: "Bureau 305, Bâtiment Principal",
-    bio: "Professeur en systèmes informatiques avec 15 ans d'expérience dans l'enseignement et la recherche.",
+    office: "Bureau 05, Département Informatique",
+    bio: "Professeur en systèmes informatiques avec 7 ans d'expérience dans l'enseignement et la recherche.",
     avatar: require('../../assets/prof-avatar.png'),
   };
 
@@ -24,20 +24,31 @@ const ProfessorProfile = () => {
           <Image source={professorData.avatar} style={styles.avatar} />
           <Text style={styles.name}>{professorData.name}</Text>
           <Text style={styles.department}>{professorData.department}</Text>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button}>
+              <MaterialIcons name="picture-as-pdf" size={20} color="#48A6A7" />
+              <Text style={styles.buttonText}>Carte Professeur</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button}>
+              <MaterialIcons name="edit" size={20} color="#48A6A7" />
+              <Text style={styles.buttonText}>Modifier Profil</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Informations Personnelles</Text>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Email:</Text>
+            <Ionicons name="mail-outline" size={20} color="#48A6A7" />
             <Text style={styles.infoValue}>{professorData.email}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Téléphone:</Text>
+            <Ionicons name="call-outline" size={20} color="#48A6A7" />
             <Text style={styles.infoValue}>{professorData.phone}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Bureau:</Text>
+            <FontAwesome name="building" size={20} color="#48A6A7" />
             <Text style={styles.infoValue}>{professorData.office}</Text>
           </View>
         </View>
@@ -47,6 +58,7 @@ const ProfessorProfile = () => {
           <Text style={styles.bioText}>{professorData.bio}</Text>
         </View>
       </ScrollView>
+
       <Menu />
     </View>
   );
@@ -63,16 +75,16 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   avatar: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 15,
+    marginBottom: 10,
   },
   name: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#0b1320',
     marginBottom: 5,
@@ -81,6 +93,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#48A6A7',
     marginBottom: 15,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 15,
+    marginTop: 10,
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#48A6A7',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  buttonText: {
+    color: '#48A6A7',
+    marginLeft: 5,
+    fontSize: 14,
   },
   section: {
     backgroundColor: '#fff',
@@ -97,41 +129,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#0b1320',
-    marginBottom: 15,
+    marginBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    paddingBottom: 10,
+    paddingBottom: 5,
   },
   infoItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
     marginBottom: 10,
   },
-  infoLabel: {
-    fontSize: 16,
-    color: '#666',
-    width: '40%',
-  },
   infoValue: {
-    fontSize: 16,
-    color: '#0b1320',
-    width: '60%',
+    fontSize: 14,
+    color: '#27445D',
     fontWeight: '500',
   },
   bioText: {
     fontSize: 16,
-    color: '#444',
+    color: '#27445D',
     lineHeight: 24,
-  },
-  footerText: {
-    position: 'absolute',
-    bottom: 70,
-    left: 0,
-    right: 0,
-    textAlign: 'center',
-    color: '#666',
-    fontSize: 12,
-    paddingHorizontal: 20,
   },
 });
 
