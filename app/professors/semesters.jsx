@@ -6,7 +6,7 @@ import Menu from '../../components/menu';
 const Semesters = () => {
   // Mock semestres et modules
   const semesters = [
-    { id: '1', semester: "Semestre 1", modules: ["Big Data", "Cloud Computing", "Machine Learning"] },
+    { id: '1', semester: "Semestre 1", modules: ["Développement Multiplateforme", "Cloud Computing", "Machine Learning"] },
     { id: '2', semester: "Semestre 2", modules: ["Deep Learning", "IA Avancée", "Blockchain"] },
   ];
 
