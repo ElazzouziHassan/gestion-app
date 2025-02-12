@@ -14,6 +14,9 @@ const ProfessorProfile = () => {
     bio: "Professeur en systèmes informatiques avec 7 ans d'expérience dans l'enseignement et la recherche.",
     avatar: require('../../assets/prof-avatar.png'),
   };
+  const handleLogout = () => {
+    // Logique de déconnexion
+  };
 
   return (
     <View style={styles.container}>
@@ -57,6 +60,10 @@ const ProfessorProfile = () => {
           <Text style={styles.sectionTitle}>Bio Professionnelle</Text>
           <Text style={styles.bioText}>{professorData.bio}</Text>
         </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Déconnexion</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <Menu />
@@ -149,6 +156,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#27445D',
     lineHeight: 24,
+  },
+  logoutButton: {
+    backgroundColor: '#d32f2f',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  logoutText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
 
