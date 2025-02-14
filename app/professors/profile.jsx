@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
 import Menu from '../../components/menu';
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
 const ProfessorProfile = () => {
   const professorData = {
@@ -13,7 +15,52 @@ const ProfessorProfile = () => {
     office: "Bureau 05, Département Informatique",
     bio: "Professeur en systèmes informatiques avec 7 ans d'expérience dans l'enseignement et la recherche.",
     avatar: require('../../assets/prof-avatar.png'),
+    qrData: "https://www.ucd.ac.ma/professeurs/boutkhoum-omar"
   };
+
+  const generatePDF = async () => {
+    try {
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }
+              .card { border: 2px solid #48A6A7; padding: 20px; border-radius: 10px; width: 300px; margin: auto; }
+              .info { font-size: 14px; color: #27445D; margin-top: 5px; }
+              .qr-container { margin-top: 15px; }
+              .avatar { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; }
+              h2, p { margin: 5px 0; }
+            </style>
+          </head>
+          <body>
+            <div class="card">
+              <div style="text-align: center;">
+                <img src="${professorData.avatar}" class="avatar" />
+                <h2>${professorData.name}</h2>
+                <p>${professorData.department}</p>
+              </div>
+              <div class="info">
+                <p><strong>Email :</strong> ${professorData.email}</p>
+                <p><strong>Téléphone :</strong> ${professorData.phone}</p>
+                <p><strong>Bureau :</strong> ${professorData.office}</p>
+              </div>
+              <div class="qr-container">
+                <p><strong>QR Code :</strong></p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${professorData.qrData}" />
+              </div>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Partager la carte du professeur' });
+
+    } catch (error) {
+      Alert.alert("Erreur", "Échec de la génération du PDF");
+    }
+  };
+
   const handleLogout = () => {
     // Logique de déconnexion
   };
@@ -29,7 +76,7 @@ const ProfessorProfile = () => {
           <Text style={styles.department}>{professorData.department}</Text>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={generatePDF}>
               <MaterialIcons name="picture-as-pdf" size={20} color="#48A6A7" />
               <Text style={styles.buttonText}>Carte Professeur</Text>
             </TouchableOpacity>
