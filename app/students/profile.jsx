@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { MaterialIcons, Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import SMenu from '../../components/smenu';
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
 const StudentProfileScreen = () => {
   const studentData = {
@@ -10,15 +12,69 @@ const StudentProfileScreen = () => {
     program: "Cycle de Master 2IAD",
     email: "elazzouzi.h855@ucd.ac.ma",
     phone: "+212 6 12 34 56 78",
-    bio: "étudiant en cycle de master Ingénierie Informatique et Analyse des Données. Actuellement, inscrit à la session autonome S1.",
+    bio: "Étudiant en cycle de master Ingénierie Informatique et Analyse des Données. Actuellement inscrit à la session autonome S1.",
     avatar: require('../../assets/student-avatar.png')
   };
-  
+
+  const generateStudentCard = async () => {
+    const qrCodeData = JSON.stringify({
+      name: studentData.name,
+      email: studentData.email,
+      phone: studentData.phone,
+      program: studentData.program,
+    });
+
+    const htmlContent = `
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }
+          .card { border: 2px solid #48A6A7; padding: 20px; border-radius: 10px; width: 300px; margin: auto; }
+          .avatar { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 10px; }
+          .name { font-size: 18px; font-weight: bold; color: #0b1320; }
+          .info { font-size: 14px; color: #27445D; margin-top: 5px; }
+          .qr-code { margin-top: 15px; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <img src="data:image/png;base64,${await getBase64Image(studentData.avatar)}" class="avatar" />
+          <div class="name">${studentData.name}</div>
+          <div class="info">${studentData.program}</div>
+          <div class="info">${studentData.email}</div>
+          <div class="info">${studentData.phone}</div>
+          <div class="qr-code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrCodeData)}" />
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await shareAsync(uri);
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de générer la carte étudiant.");
+    }
+  };
+
+  // Fonction pour convertir une image locale en base64
+  const getBase64Image = async (image) => {
+    const response = await fetch(Image.resolveAssetSource(image).uri);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" hidden={false} />
-      
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Image source={studentData.avatar} style={styles.avatar} />
@@ -26,9 +82,9 @@ const StudentProfileScreen = () => {
           <Text style={styles.program}>{studentData.program}</Text>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={generateStudentCard}>
               <MaterialIcons name="picture-as-pdf" size={20} color="#48A6A7" />
-              <Text style={styles.buttonText}>Carte Professeur</Text>
+              <Text style={styles.buttonText}>Carte d'Étudiant</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button}>
               <MaterialIcons name="edit" size={20} color="#48A6A7" />
@@ -59,7 +115,6 @@ const StudentProfileScreen = () => {
         </View>
       </ScrollView>
 
-      {/* Bouton de déconnexion */}
       <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8}>
         <Text style={styles.logoutText}>Déconnexion</Text>
       </TouchableOpacity>
@@ -169,7 +224,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  
 });
 
 export default StudentProfileScreen;
