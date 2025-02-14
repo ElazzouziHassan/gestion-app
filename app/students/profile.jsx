@@ -59,7 +59,6 @@ const StudentProfileScreen = () => {
     }
   };
 
-  // Fonction pour convertir une image locale en base64
   const getBase64Image = async (image) => {
     const response = await fetch(Image.resolveAssetSource(image).uri);
     const blob = await response.blob();
