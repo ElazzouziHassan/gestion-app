@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 mongoose
-  .connect("mongodb+srv://ezhassaninfo:kVMkWya76jd9vBRz@cluster0.xfbdr.mongodb.net/", {
+  .connect("#", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
