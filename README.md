@@ -1,6 +1,6 @@
 # README - Application Mobile de Gestion des Cycles de Master:
 
-![Application](/public/banner%20(2).png)
+![Application](/public/banner.png)
 
 Cette application mobile permet aux étudiants et professeurs d’accéder facilement aux informations relatives aux cycles de master à la Faculté des Sciences de l'Université Chouaib Doukkali. Elle offre une gestion optimisée des emplois du temps, des modules.
 
