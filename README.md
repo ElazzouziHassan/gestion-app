@@ -1,4 +1,4 @@
-# README - Application Mobile de Gestion des Cycles de Master:
+# Application Mobile de Gestion des Cycles de Master:
 
 ![Application](/public/banner.png)
 
