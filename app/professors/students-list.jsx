@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as FileSystem from 'expo-file-system';
@@ -9,31 +9,29 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Menu from '../../components/menu';
 
 const StudentsListScreen = () => {
-  const [loading, setLoading] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const masterPrograms = [
-    {
-      id: '1',
-      name: "MASTER 2IAD",
-      count: 34,
-      students: Array.from({ length: 34 }, (_, i) => ({
-        id: i + 1,
-        name: `Étudiant ${i + 1}`,
-        matricule: `MAT2IAD${String(i + 1).padStart(3, '0')}`,
-      }))
-    },
-    {
-      id: '2',
-      name: "MASTER BIBDA",
-      count: 36,
-      students: Array.from({ length: 36 }, (_, i) => ({
-        id: i + 1,
-        name: `Étudiant ${i + 1}`,
-        matricule: `MATBIBDA${String(i + 1).padStart(3, '0')}`,
-      }))
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const response = await axios.get('http://192.168.0.115:3000/api/mobile/students');
+      setStudents(response.data); // Assuming API returns an array of students
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  console.log(students);
   const handleExport = async (type, students) => {
     try {
       setLoading(true);
