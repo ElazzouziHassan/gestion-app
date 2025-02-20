@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as FileSystem from 'expo-file-system';
@@ -9,33 +9,58 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Menu from '../../components/menu';
 
 const StudentsListScreen = () => {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [masterPrograms, setMasterPrograms] = useState([]);
+  const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch('http://192.168.0.115:3000/api/mobile/students');
+        const data = await response.json();
+
+        if (response.ok) {
+          // Group students by cycleName
+          const groupedStudents = data.reduce((acc, student) => {
+            const cycleName = student.cycleName;
+            if (!acc[cycleName]) {
+              acc[cycleName] = [];
+            }
+            acc[cycleName].push(student);
+            return acc;
+          }, {});
+
+          // Transform grouped data into masterPrograms format
+          const programs = Object.keys(groupedStudents).map((cycleName, index) => ({
+            id: String(index + 1),
+            name: cycleName,
+            count: groupedStudents[cycleName].length,
+            students: groupedStudents[cycleName].map((student, i) => ({
+              id: student._id,
+              name: `${student.firstName} ${student.lastName}`,
+              matricule: student.studentNumber,
+            })),
+          }));
+
+          setMasterPrograms(programs);
+        } else {
+          setError(data.message || 'Failed to fetch students');
+        }
+      } catch (err) {
+        setError(err.message || 'An error occurred');
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
     fetchStudents();
   }, []);
 
-  const fetchStudents = async () => {
-    try {
-      const response = await axios.get('http://192.168.0.115:3000/api/mobile/students');
-      setStudents(response.data); // Assuming API returns an array of students
-    } catch (error) {
-      console.error('Error fetching students:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
-  console.log(students);
   const handleExport = async (type, students) => {
     try {
       setLoading(true);
-      
+
       if (type === 'pdf') {
         const html = `
           <html>
@@ -57,8 +82,8 @@ const StudentsListScreen = () => {
                 </tr>
                 ${students.map(student => `
                   <tr>
-                    <td>${student.name}</td>
-                    <td>${student.matricule}</td>
+                    <td>${student.name || 'N/A'}</td>
+                    <td>${student.matricule || 'N/A'}</td>
                   </tr>
                 `).join('')}
               </table>
@@ -68,13 +93,12 @@ const StudentsListScreen = () => {
 
         const { uri } = await Print.printToFileAsync({ html });
         await Sharing.shareAsync(uri);
-      }
-      else if (type === 'excel') {
+      } else if (type === 'excel') {
         const wsData = [
           ['Nom', 'Matricule'],
           ...students.map(student => [
-            student.name,
-            student.matricule
+            student.name || 'N/A', // Fallback to 'N/A' if name is undefined
+            student.matricule || 'N/A' // Fallback to 'N/A' if matricule is undefined
           ])
         ];
 
@@ -97,6 +121,23 @@ const StudentsListScreen = () => {
       setLoading(false);
     }
   };
+
+  if (isFetching) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0b1320" />
+        <Text style={styles.loadingText}>Chargement des données...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -223,6 +264,15 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     color: '#666',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
   },
 });
 
