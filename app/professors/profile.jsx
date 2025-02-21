@@ -1,21 +1,57 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import Menu from '../../components/menu';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
 
+const API_URL = 'http://192.168.0.109:3000/api/mobile';
+
 const ProfessorProfile = () => {
-  const professorData = {
-    name: "Dr. BOUTKHOUM Omar",
-    email: "boutkhoum.omar@ucd.ac.ma",
-    department: "Informatique",
-    phone: "+212 6 12 34 56 78",
-    office: "Bureau 05, Département Informatique",
-    bio: "Professeur en systèmes informatiques avec 7 ans d'expérience dans l'enseignement et la recherche.",
-    avatar: require('../../assets/prof-avatar.png'),
-    qrData: "https://www.ucd.ac.ma/professeurs/boutkhoum-omar"
+  const [professorData, setProfessorData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const avatar = require('../../assets/prof-avatar.png')
+
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchProfessorData();
+  }, []);
+
+  const fetchProfessorData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      const userId = await AsyncStorage.getItem('userId');
+
+      if (!token || !userId) {
+        router.replace('/auth/login');
+        return;
+      }
+
+      const api = axios.create({
+        baseURL: API_URL,
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const response = await api.get('/professors');
+      if (response.data && Array.isArray(response.data)) {
+        const currentProfessor = response.data.find(prof => prof._id === userId);
+        if (currentProfessor) {
+          setProfessorData(currentProfessor);
+        } else {
+          throw new Error('Professor not found');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching professor data:', error.response?.data || error.message);
+      Alert.alert('Erreur', 'Impossible de charger les données. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const generatePDF = async () => {
@@ -35,7 +71,7 @@ const ProfessorProfile = () => {
           <body>
             <div class="card">
               <div style="text-align: center;">
-                <img src="${professorData.avatar}" class="avatar" />
+                <img src="${avatar}" class="avatar" />
                 <h2>${professorData.name}</h2>
                 <p>${professorData.department}</p>
               </div>
@@ -61,9 +97,32 @@ const ProfessorProfile = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Logique de déconnexion
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('userId');
+      router.replace('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#48A6A7" />
+      </View>
+    );
+  }
+
+  if (!professorData) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Unable to load professor data</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -71,9 +130,9 @@ const ProfessorProfile = () => {
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Image source={professorData.avatar} style={styles.avatar} />
-          <Text style={styles.name}>{professorData.name}</Text>
-          <Text style={styles.department}>{professorData.department}</Text>
+          <Image source={ require('../../assets/prof-avatar.png') } style={styles.avatar} />
+          <Text style={styles.name}>{'Dr. '+professorData.firstName+ ' '+ professorData.lastName}</Text>
+          <Text style={styles.department}>Informatique</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={generatePDF}>
@@ -95,17 +154,17 @@ const ProfessorProfile = () => {
           </View>
           <View style={styles.infoItem}>
             <Ionicons name="call-outline" size={20} color="#48A6A7" />
-            <Text style={styles.infoValue}>{professorData.phone}</Text>
+            <Text style={styles.infoValue}>{professorData.telephone}</Text>
           </View>
           <View style={styles.infoItem}>
             <FontAwesome name="building" size={20} color="#48A6A7" />
-            <Text style={styles.infoValue}>{professorData.office}</Text>
+            <Text style={styles.infoValue}>Bureau 05, Département Informatique</Text>
           </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Bio Professionnelle</Text>
-          <Text style={styles.bioText}>{professorData.bio}</Text>
+          <Text style={styles.bioText}>Professeur en systèmes informatiques avec 7 ans d'expérience dans l'enseignement et la recherche.</Text>
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -215,6 +274,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 20,
+  },
+  errorText: {
+    color: '#dc3545',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 
