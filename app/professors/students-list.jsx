@@ -17,7 +17,7 @@ const StudentsListScreen = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await fetch('http://192.168.0.115:3000/api/mobile/students');
+        const response = await fetch('http://192.168.0.109:3000/api/mobile/students');
         const data = await response.json();
 
         if (response.ok) {
