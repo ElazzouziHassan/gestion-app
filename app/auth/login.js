@@ -16,7 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.0.115:3000/api/mobile'; // Replace with your actual API URL
+const API_URL = 'http://192.168.0.109:3000/api/mobile'; // Replace with your actual API URL
 
 const Login = () => {
   const [email, setEmail] = useState('');
